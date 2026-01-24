@@ -1,0 +1,15 @@
+meta {
+  name: Get weather forecase
+  type: http
+  seq: 1
+}
+
+get {
+  url: https://krupamjo-api.azurewebsites.net/weatherforecast
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+}
