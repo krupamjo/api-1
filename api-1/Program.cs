@@ -32,7 +32,7 @@ app.MapGet("/weatherforecast", () =>
     return forecast;
 })
 .WithName("GetWeatherForecast");
-
+app.UseCors(options => options.AllowAnyOrigin());
 app.Run();
 
 record WeatherForecast(DateOnly Date, float TemperatureC, string? Summary)
