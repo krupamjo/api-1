@@ -1,15 +1,16 @@
 meta {
-  name: Get weather forecase
+  name: Get Pets
   type: http
   seq: 1
 }
 
 get {
-  url: https://krupamjo-api.azurewebsites.net/weatherforecast
+  url: {{URL}}/pets
   body: none
   auth: inherit
 }
 
 settings {
   encodeUrl: true
+  timeout: 0
 }

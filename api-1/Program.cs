@@ -1,3 +1,6 @@
+using api_1;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -5,7 +8,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 
 builder.Services.AddCors();
-
+var connectionString = builder.Configuration.GetConnectionString("PetsDatabase");
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+{
+    options.UseSqlServer(connectionString);
+});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -16,28 +23,12 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-var summaries = new[]
+app.MapGet("/pets", async context =>
 {
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
+    var dbContext = context.RequestServices.GetRequiredService<ApplicationDbContext>();
+    var pets = await dbContext.Pets.ToListAsync();
+    await context.Response.WriteAsJsonAsync(pets);
 })
-.WithName("GetWeatherForecast");
+.WithName("GetPets");
 app.UseCors(options => options.AllowAnyOrigin());
 app.Run();
-
-record WeatherForecast(DateOnly Date, float TemperatureC, string? Summary)
-{
-    public float TemperatureF => 32 + (float)(TemperatureC / (float)(5.0 / 9.0));
-}
